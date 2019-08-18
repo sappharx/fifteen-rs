@@ -1,4 +1,10 @@
-use std::{error, fmt};
+mod coordinates;
+pub mod error;
+mod util;
+
+use coordinates::Coordinates;
+use error::Error;
+use util::get_starting_index;
 
 #[derive(Debug, PartialEq)]
 pub struct Board {
@@ -47,12 +53,10 @@ impl Board {
             }
             (Some(zero_coords), Some(tile_coords)) => {
                 let is_valid_move = {
-                    let same_row = tile_coords.row == zero_coords.row;
-                    let same_col = tile_coords.col == zero_coords.col;
-                    let adjacent_row =
-                        i32::abs(tile_coords.row as i32 - zero_coords.row as i32) == 1;
-                    let adjacent_col =
-                        i32::abs(tile_coords.col as i32 - zero_coords.col as i32) == 1;
+                    let same_row = tile_coords.is_same_row(zero_coords);
+                    let same_col = tile_coords.is_same_col(zero_coords);
+                    let adjacent_row = tile_coords.is_adjacent_row(zero_coords);
+                    let adjacent_col = tile_coords.is_adjacent_col(zero_coords);
 
                     match (same_row, same_col, adjacent_row, adjacent_col) {
                         (true, false, false, true) => true,
@@ -75,7 +79,7 @@ impl Board {
         for i in 0..self.size as usize {
             for j in 0..self.size as usize {
                 if self.grid[i][j] == tile {
-                    return Some(Coordinates { row: i, col: j });
+                    return Some(Coordinates::new( i, j ));
                 }
             }
         }
@@ -91,19 +95,9 @@ impl Board {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-struct Coordinates {
-    row: usize,
-    col: usize,
-}
-
-fn get_starting_index(size: u8, row: u8, col: u8) -> u8 {
-    size * size - row * size - (col + 1)
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::{get_starting_index, Board, Coordinates};
+    use crate::{Board, Coordinates};
 
     #[test]
     fn test_board_get_coordinates() {
@@ -130,48 +124,5 @@ mod tests {
         assert_eq!(board.grid[3][3], 1);
     }
 
-    #[test]
-    fn test_get_starting_index() {
-        assert_eq!(get_starting_index(4, 0, 0), 15);
-        assert_eq!(get_starting_index(4, 3, 3), 0);
-    }
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Error {
-    message: String,
-}
-
-impl Error {
-    pub fn new(message: String) -> Error {
-        Error { message }
-    }
-
-    pub fn to_string(self) -> String {
-        self.into()
-    }
-}
-
-impl AsRef<str> for Error {
-    fn as_ref(&self) -> &str {
-        &self.message
-    }
-}
-
-impl From<Error> for String {
-    fn from(e: Error) -> String {
-        e.message
-    }
-}
-
-impl error::Error for Error {
-    fn description(&self) -> &str {
-        &self.message
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, formatter: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        self.message.fmt(formatter)
-    }
-}
