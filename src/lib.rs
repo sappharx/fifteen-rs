@@ -13,10 +13,10 @@ impl Board {
             let mut row = Vec::with_capacity(size as usize);
 
             for j in 0..size {
-                row.push( get_starting_index(size, i, j) );
+                row.push(get_starting_index(size, i, j));
             }
 
-            grid.push( row );
+            grid.push(row);
         }
 
         Board { size, grid }
@@ -24,7 +24,7 @@ impl Board {
 
     pub fn move_tile(&mut self, tile: u8) -> Result<(), Error> {
         if tile == 0 {
-            return Err( Error::new("can't move empty tile".to_string()) );
+            return Err(Error::new("can't move empty tile".to_string()));
         }
 
         let zero_coords = self.get_coordinates(0);
@@ -35,18 +35,24 @@ impl Board {
         }
 
         if let None = tile_coords {
-            return Err( Error::new("tile doesn't exist on board".to_string()) );
+            return Err(Error::new("tile doesn't exist on board".to_string()));
         }
 
         match (zero_coords, tile_coords) {
-            (None, _) => { panic!("can't find empty space on board"); },
-            (_, None) => { return Err( Error::new("tile doesn't exist on board".to_string()) ); },
+            (None, _) => {
+                panic!("can't find empty space on board");
+            }
+            (_, None) => {
+                return Err(Error::new("tile doesn't exist on board".to_string()));
+            }
             (Some(zero_coords), Some(tile_coords)) => {
                 let is_valid_move = {
                     let same_row = tile_coords.row == zero_coords.row;
                     let same_col = tile_coords.col == zero_coords.col;
-                    let adjacent_row = i32::abs( tile_coords.row as i32 - zero_coords.row as i32 ) == 1;
-                    let adjacent_col = i32::abs( tile_coords.col as i32 - zero_coords.col as i32 ) == 1;
+                    let adjacent_row =
+                        i32::abs(tile_coords.row as i32 - zero_coords.row as i32) == 1;
+                    let adjacent_col =
+                        i32::abs(tile_coords.col as i32 - zero_coords.col as i32) == 1;
 
                     match (same_row, same_col, adjacent_row, adjacent_col) {
                         (true, false, false, true) => true,
@@ -69,7 +75,7 @@ impl Board {
         for i in 0..self.size as usize {
             for j in 0..self.size as usize {
                 if self.grid[i][j] == tile {
-                    return Some( Coordinates { row: i, col: j });
+                    return Some(Coordinates { row: i, col: j });
                 }
             }
         }
@@ -97,21 +103,27 @@ fn get_starting_index(size: u8, row: u8, col: u8) -> u8 {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Board,Coordinates, get_starting_index };
+    use crate::{get_starting_index, Board, Coordinates};
 
     #[test]
     fn test_board_get_coordinates() {
         let board = Board::new(4);
-        assert_eq!(board.get_coordinates(15), Some(Coordinates{ row: 0, col: 0 }));
-        assert_eq!(board.get_coordinates(9), Some(Coordinates{ row: 1, col: 2 }));
+        assert_eq!(
+            board.get_coordinates(15),
+            Some(Coordinates { row: 0, col: 0 })
+        );
+        assert_eq!(
+            board.get_coordinates(9),
+            Some(Coordinates { row: 1, col: 2 })
+        );
     }
 
     #[test]
     fn test_board_swap() {
         let mut board = Board::new(4);
 
-        let a = Coordinates { row: 3, col: 2};
-        let b = Coordinates { row: 3, col: 3};
+        let a = Coordinates { row: 3, col: 2 };
+        let b = Coordinates { row: 3, col: 3 };
         board.swap(a, b);
 
         assert_eq!(board.grid[3][2], 0);
