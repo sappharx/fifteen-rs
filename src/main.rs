@@ -1,7 +1,16 @@
 use fifteen::Board;
 
 fn main() {
-    let board = Board::new(4);
+    let mut board = Board::new(4);
 
     println!("{:?}", board);
+
+    let moves = [1, 5, 13];
+
+    for x in moves.iter() {
+        match board.move_tile(*x) {
+            Ok(()) => println!("{:?}", board),
+            Err(e) => eprintln!("{}", e),
+        };
+    }
 }
