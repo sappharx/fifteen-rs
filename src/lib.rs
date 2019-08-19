@@ -2,6 +2,8 @@ mod coordinates;
 pub mod error;
 mod util;
 
+use std::fmt;
+
 use coordinates::Coordinates;
 use error::Error;
 use util::get_starting_index;
@@ -79,7 +81,7 @@ impl Board {
         for i in 0..self.size as usize {
             for j in 0..self.size as usize {
                 if self.grid[i][j] == tile {
-                    return Some(Coordinates::new( i, j ));
+                    return Some(Coordinates::new(i, j));
                 }
             }
         }
@@ -95,12 +97,32 @@ impl Board {
     }
 }
 
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let max_len = u8::to_string(&self.size.pow(2)).len() as usize;
+
+        for row in 0..self.size {
+            for col in 0..self.size {
+                let val = self.grid[row as usize][col as usize];
+                let output = match val {
+                    0 => "".to_string(),
+                    _ => val.to_string(),
+                };
+                write!(f, " {:>width$}", output, width = max_len)?
+            }
+            writeln!(f, "")?
+        }
+
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{Board, Coordinates};
 
     #[test]
-    fn test_board_get_coordinates() {
+    fn test_get_coordinates() {
         let board = Board::new(4);
         assert_eq!(
             board.get_coordinates(15),
@@ -113,7 +135,7 @@ mod tests {
     }
 
     #[test]
-    fn test_board_swap() {
+    fn test_swap() {
         let mut board = Board::new(4);
 
         let a = Coordinates { row: 3, col: 2 };
@@ -125,4 +147,3 @@ mod tests {
     }
 
 }
-
