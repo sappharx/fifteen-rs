@@ -3,7 +3,8 @@ use std::io::{self, Write};
 use fifteen::Board;
 
 fn main() {
-    let mut board = Board::new(4);
+    let mut board = Board::random(4);
+    // let mut board = Board::new(4);
 
     loop {
         // clear screen

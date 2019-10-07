@@ -4,6 +4,9 @@ mod util;
 
 use std::fmt;
 
+use rand::seq::SliceRandom;
+use rand::thread_rng;
+
 use coordinates::Coordinates;
 use error::Error;
 use util::get_starting_index;
@@ -28,6 +31,21 @@ impl Board {
         }
 
         Board { size, grid }
+    }
+
+    pub fn random(size: u8) -> Board {
+        let mut list = Vec::with_capacity((size * size) as usize);
+
+        for i in 0..size {
+            for j in 0..size {
+                list.push(size * i as u8 + j as u8);
+            }
+        }
+
+        let mut rng = thread_rng();
+        list.shuffle(&mut rng);
+
+        Board::from_list(size, list).unwrap()
     }
 
     fn from_list(size: u8, list: Vec<u8>) -> Result<Board, Error> {
@@ -62,7 +80,6 @@ impl Board {
                 };
 
                 if self.grid[i][j] != expected {
-                    println!("expected: {}; got: {}", expected, self.grid[i][j]);
                     return false;
                 }
             }
