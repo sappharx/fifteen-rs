@@ -100,14 +100,6 @@ impl Board {
         let zero_coords = self.get_coordinates(0);
         let tile_coords = self.get_coordinates(tile);
 
-        if let None = zero_coords {
-            panic!("can't find empty space on board");
-        }
-
-        if let None = tile_coords {
-            return Err(Error::new("tile doesn't exist on board".to_string()));
-        }
-
         match (zero_coords, tile_coords) {
             (None, _) => {
                 panic!("can't find empty space on board");
