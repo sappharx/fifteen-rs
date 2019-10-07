@@ -30,6 +30,47 @@ impl Board {
         Board { size, grid }
     }
 
+    fn from_list(size: u8, list: Vec<u8>) -> Result<Board, Error> {
+        if ( list.len() as u8 ) < size * size {
+            return Err(Error::new(format!("not enough elements in list; expected {}, got {}", size * size, list.len())));
+        }
+
+        let mut grid = Vec::with_capacity(size as usize);
+
+        for i in 0..size {
+            let mut row = Vec::with_capacity(size as usize);
+
+            for j in 0..size {
+                let idx = size * i as u8 + j as u8;
+                row.push(list[idx as usize]);
+            }
+
+            grid.push(row);
+        }
+
+        Ok(Board { size, grid } )
+    }
+
+    pub fn is_complete(&self) -> bool {
+        for i in 0..self.size as usize {
+            for j in 0..self.size as usize {
+                let max: usize = self.size as usize - 1;
+                let expected = if i == max && j == max {
+                    0
+                } else {
+                    1 + self.size * i as u8 + j as u8
+                };
+
+                if self.grid[i][j] != expected {
+                    println!("expected: {}; got: {}", expected, self.grid[i][j]);
+                    return false;
+                }
+            }
+        }
+
+        true
+    }
+
     pub fn move_tile(&mut self, tile: u8) -> Result<(), Error> {
         if tile == 0 {
             return Err(Error::new("can't move empty tile".to_string()));
@@ -120,6 +161,40 @@ impl fmt::Display for Board {
 #[cfg(test)]
 mod tests {
     use crate::{Board, Coordinates};
+
+    #[test]
+    fn test_from_list() {
+        let board = Board::from_list(4, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14, 15, 0]).unwrap();
+
+        assert_eq!(board.grid[0][0], 1);
+        assert_eq!(board.grid[0][1], 2);
+        assert_eq!(board.grid[0][2], 3);
+        assert_eq!(board.grid[0][3], 4);
+
+        assert_eq!(board.grid[1][0], 5);
+        assert_eq!(board.grid[1][1], 6);
+        assert_eq!(board.grid[1][2], 7);
+        assert_eq!(board.grid[1][3], 8);
+
+        assert_eq!(board.grid[2][0], 9);
+        assert_eq!(board.grid[2][1], 10);
+        assert_eq!(board.grid[2][2], 11);
+        assert_eq!(board.grid[2][3], 12);
+
+        assert_eq!(board.grid[3][0], 13);
+        assert_eq!(board.grid[3][1], 14);
+        assert_eq!(board.grid[3][2], 15);
+        assert_eq!(board.grid[3][3], 0);
+    }
+
+    #[test]
+    fn test_is_complete() {
+        let complete_board = Board::from_list(4, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14, 15, 0]).unwrap();
+        let incomplete_board = Board::from_list(4, vec![2, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14, 15, 0]).unwrap();
+
+        assert!(complete_board.is_complete());
+        assert!(!incomplete_board.is_complete());
+    }
 
     #[test]
     fn test_get_coordinates() {
