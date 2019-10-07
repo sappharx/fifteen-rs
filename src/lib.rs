@@ -49,8 +49,12 @@ impl Board {
     }
 
     fn from_list(size: u8, list: Vec<u8>) -> Result<Board, Error> {
-        if ( list.len() as u8 ) < size * size {
-            return Err(Error::new(format!("not enough elements in list; expected {}, got {}", size * size, list.len())));
+        if (list.len() as u8) < size * size {
+            return Err(Error::new(format!(
+                "not enough elements in list; expected {}, got {}",
+                size * size,
+                list.len()
+            )));
         }
 
         let mut grid = Vec::with_capacity(size as usize);
@@ -66,7 +70,7 @@ impl Board {
             grid.push(row);
         }
 
-        Ok(Board { size, grid } )
+        Ok(Board { size, grid })
     }
 
     pub fn is_complete(&self) -> bool {
@@ -181,7 +185,11 @@ mod tests {
 
     #[test]
     fn test_from_list() {
-        let board = Board::from_list(4, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14, 15, 0]).unwrap();
+        let board = Board::from_list(
+            4,
+            vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0],
+        )
+        .unwrap();
 
         assert_eq!(board.grid[0][0], 1);
         assert_eq!(board.grid[0][1], 2);
@@ -206,8 +214,16 @@ mod tests {
 
     #[test]
     fn test_is_complete() {
-        let complete_board = Board::from_list(4, vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14, 15, 0]).unwrap();
-        let incomplete_board = Board::from_list(4, vec![2, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,14, 15, 0]).unwrap();
+        let complete_board = Board::from_list(
+            4,
+            vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0],
+        )
+        .unwrap();
+        let incomplete_board = Board::from_list(
+            4,
+            vec![2, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0],
+        )
+        .unwrap();
 
         assert!(complete_board.is_complete());
         assert!(!incomplete_board.is_complete());

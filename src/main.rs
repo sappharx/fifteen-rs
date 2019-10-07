@@ -32,10 +32,10 @@ fn main() {
                             Err(e) => println!("{}", e),
                         };
                     }
-                    Err(e) => println!("invalid input: {}", e)
+                    Err(e) => println!("invalid input: {}", e),
                 };
             }
-            Err(e) => println!("error reading from stdin: {}", e)
+            Err(e) => println!("error reading from stdin: {}", e),
         };
     }
 }
